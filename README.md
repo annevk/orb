@@ -21,13 +21,13 @@ A request has an associated **opaque media identifier** (null or an opaque ident
 To determine whether to allow response _response_ to a request _request_, run these steps:
 
 1. Let _mimeType_ be the result of [extracting a MIME type](https://fetch.spec.whatwg.org/#concept-header-extract-mime-type) from _response_'s header list.
-1. If _mimeType_ is failure, then return true.
-1. If _mimeType_ is a [JavaScript MIME type](https://mimesniff.spec.whatwg.org/#javascript-mime-type), then return true.
-1. If _mimeType_'s essence is "`text/css`", then return true.
-1. If _mimeType_'s essence is "`image/svg+xml`", then return true.
-1. If _response_'s status is `206` and _mimeType_ is an opaque-blocklist MIME type, then return false. TODO: is this needed with the requesters set?
 1. Let _nosniff_ be the result of [determining nosniff](https://fetch.spec.whatwg.org/#determine-nosniff) given _response_'s header list.
-1. If _nosniff_ is true and _mimeType_ is an opaque-blocklist MIME type or its essence is "`text/plain`", then return false.
+1. If _mimeType_ is not failure, then:
+   1. If _mimeType_ is a [JavaScript MIME type](https://mimesniff.spec.whatwg.org/#javascript-mime-type), then return true.
+   1. If _mimeType_'s essence is "`text/css`", then return true.
+   1. If _mimeType_'s essence is "`image/svg+xml`", then return true.
+   1. If _response_'s status is `206` and _mimeType_ is an opaque-blocklist MIME type, then return false. TODO: is this needed with the requesters set?
+   1. If _nosniff_ is true and _mimeType_ is an opaque-blocklist MIME type or its essence is "`text/plain`", then return false.
 1. If the user agent's opaque-safelisted requesters set contains (_request_'s opaque media identifier, _request_'s current URL), then return true.
 1. Wait for 1024 bytes of _response_ or end-of-file, whichever comes first and let _bytes_ be those bytes.
 1. If the [image type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#image-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then return true.
@@ -36,6 +36,7 @@ To determine whether to allow response _response_ to a request _request_, run th
    1. Return true.
 1. If _nosniff_ is true, then return false.
 1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
+1. If _mimeType_ is failure, then return true.
 1. If _mimeType_'s essence starts with "`audio/`", "`image/`", or "`video/`", then return false.
 1. If _mimeType_'s essence is "`text/csv`", then return false.
 1. If _response_'s body parses as JavaScript and does not parse as JSON, then return true.
