@@ -35,6 +35,9 @@ To determine whether to allow response _response_ to a request _request_, run th
    1. Append (_request_'s opaque media identifier, _request_'s current URL) to the user agent's opaque-safelisted requesters set.
    1. Return true.
 1. If _nosniff_ is true, then return false.
+1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
+1. If _mimeType_'s essence starts with "`audio/`", "`image/`", or "`video/`", then return false.
+1. If _mimeType_'s essence is "`text/csv`", then return false.
 1. If _response_'s body parses as JavaScript and does not parse as JSON, then return true.
 1. Return false.
 
