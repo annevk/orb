@@ -46,7 +46,7 @@ Note: responses for which the above algorithm returns true and contain secrets a
 
 ## Findings
 
-* It's unfortunate `X-Content-Type-Options` mostly kicks in after media sniffing, but it was not web compatible for Firefox to enforce it for images back in the day. (`X-Content-Type-Options` enforcement for specific callers, such as style sheets and scripts will remain and complement the above algorithm.)
+* It's unfortunate `X-Content-Type-Options` mostly kicks in after media sniffing, but it was not web compatible for Firefox to enforce it for images back in the day.
 * Due to the way [style sheet fetching works](https://github.com/whatwg/fetch/issues/964) we cannot protect responses without an extractable MIME type.
 
 ## Acknowledgments
