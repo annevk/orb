@@ -14,41 +14,42 @@ An **opaque-safelisted MIME type** is a [JavaScript MIME type](https://mimesniff
 
 An **opaque-blocklisted MIME type** is an [HTML MIME type](https://mimesniff.spec.whatwg.org/#html-mime-type), [JSON MIME type](https://mimesniff.spec.whatwg.org/#json-mime-type), or [XML MIME type](https://mimesniff.spec.whatwg.org/#xml-mime-type).
 
-An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence is
-"`application/gzip`",
-"`application/msexcel`",
-"`application/mspowerpoint`",
-"`application/msword`",
-"`application/msword-template`",
-"`application/pdf`",
-"`application/vnd.ces-quickpoint`",
-"`application/vnd.ces-quicksheet`",
-"`application/vnd.ces-quickword`",
-"`application/vnd.ms-excel`",
-"`application/vnd.ms-excel.sheet.macroenabled.12`",
-"`application/vnd.ms-powerpoint`",
-"`application/vnd.ms-powerpoint.presentation.macroenabled.12`",
-"`application/vnd.ms-word`",
-"`application/vnd.ms-word.document.12`",
-"`application/vnd.ms-word.document.macroenabled.12`",
-"`application/vnd.msword`",
-"`application/vnd.openxmlformats-officedocument.presentationml.presentation`",
-"`application/vnd.openxmlformats-officedocument.presentationml.template`",
-"`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`",
-"`application/vnd.openxmlformats-officedocument.spreadsheetml.template`",
-"`application/vnd.openxmlformats-officedocument.wordprocessingml.document`",
-"`application/vnd.openxmlformats-officedocument.wordprocessingml.template`",
-"`application/vnd.presentation-openxml`",
-"`application/vnd.presentation-openxmlm`",
-"`application/vnd.spreadsheet-openxml`",
-"`application/vnd.wordprocessing-openxml`",
-"`application/x-gzip`",
-"`application/x-protobuf`",
-"`application/zip`",
-"`multipart/byteranges`"
-"`multipart/signed`",
-"`text/event-stream`", or
-"`text/csv`".
+An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence is one of
+
+* "`application/gzip`"
+* "`application/msexcel`"
+* "`application/mspowerpoint`"
+* "`application/msword`"
+* "`application/msword-template`"
+* "`application/pdf`"
+* "`application/vnd.ces-quickpoint`"
+* "`application/vnd.ces-quicksheet`"
+* "`application/vnd.ces-quickword`"
+* "`application/vnd.ms-excel`"
+* "`application/vnd.ms-excel.sheet.macroenabled.12`"
+* "`application/vnd.ms-powerpoint`"
+* "`application/vnd.ms-powerpoint.presentation.macroenabled.12`"
+* "`application/vnd.ms-word`"
+* "`application/vnd.ms-word.document.12`"
+* "`application/vnd.ms-word.document.macroenabled.12`"
+* "`application/vnd.msword`"
+* "`application/vnd.openxmlformats-officedocument.presentationml.presentation`"
+* "`application/vnd.openxmlformats-officedocument.presentationml.template`"
+* "`application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`"
+* "`application/vnd.openxmlformats-officedocument.spreadsheetml.template`"
+* "`application/vnd.openxmlformats-officedocument.wordprocessingml.document`"
+* "`application/vnd.openxmlformats-officedocument.wordprocessingml.template`"
+* "`application/vnd.presentation-openxml`"
+* "`application/vnd.presentation-openxmlm`"
+* "`application/vnd.spreadsheet-openxml`"
+* "`application/vnd.wordprocessing-openxml`"
+* "`application/x-gzip`"
+* "`application/x-protobuf`"
+* "`application/zip`"
+* "`multipart/byteranges`"
+* "`multipart/signed`"
+* "`text/event-stream`"
+* "`text/csv`"
 
 A user agent has an **opaque-safelisted requesters set**. (This should be scoped similar to other network caches.)
 
