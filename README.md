@@ -45,6 +45,7 @@ An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence i
 * "`application/vnd.wordprocessing-openxml`"
 * "`application/x-gzip`"
 * "`application/x-protobuf`"
+* "`application/x-protobuffer`"
 * "`application/zip`"
 * "`multipart/byteranges`"
 * "`multipart/signed`"
