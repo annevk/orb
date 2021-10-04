@@ -77,6 +77,7 @@ To determine whether to allow response _response_ to a request _request_, run th
 1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
 1. If _mimeType_ is failure, then return true.
 1. If _mimeType_'s essence starts with "`audio/`", "`image/`", or "`video/`", then return false.
+1. Wait for end-of-file of _response_'s body. Note: as discussed in [GitHub's annevk/orb #22](https://github.com/annevk/orb/issues/22) partially parsing JavaScript is unfortunately infeasible. This might end up leaking the size of responses that hit this step.
 1. If _response_'s body parses as JavaScript and does not parse as JSON, then return true.
 1. Return false.
 
