@@ -16,12 +16,14 @@ An **opaque-blocklisted MIME type** is an [HTML MIME type](https://mimesniff.spe
 
 An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence is one of
 
+* "`application/dash+xml`"
 * "`application/gzip`"
 * "`application/msexcel`"
 * "`application/mspowerpoint`"
 * "`application/msword`"
 * "`application/msword-template`"
 * "`application/pdf`"
+* "`application/vnd.apple.mpegurl`"
 * "`application/vnd.ces-quickpoint`"
 * "`application/vnd.ces-quicksheet`"
 * "`application/vnd.ces-quickword`"
@@ -47,10 +49,12 @@ An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence i
 * "`application/x-protobuf`"
 * "`application/x-protobuffer`"
 * "`application/zip`"
+* "`audio/mpegurl`"
 * "`multipart/byteranges`"
 * "`multipart/signed`"
 * "`text/event-stream`"
 * "`text/csv`"
+* "`text/vtt`"
 
 A user agent has an **opaque-safelisted requesters set**. (This should be scoped similar to other network caches.)
 
