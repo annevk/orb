@@ -10,6 +10,8 @@ CSS, JavaScript, images, and media (audio and video) can be requested across ori
 
 ## Processing model
 
+### New MIME type sets
+
 An **opaque-safelisted MIME type** is a [JavaScript MIME type](https://mimesniff.spec.whatwg.org/#javascript-mime-type) or a MIME type whose essence is "`text/css`" or "`image/svg+xml`".
 
 An **opaque-blocklisted MIME type** is an [HTML MIME type](https://mimesniff.spec.whatwg.org/#html-mime-type), [JSON MIME type](https://mimesniff.spec.whatwg.org/#json-mime-type), or [XML MIME type](https://mimesniff.spec.whatwg.org/#xml-mime-type).
@@ -52,7 +54,18 @@ An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence i
 * "`text/event-stream`"
 * "`text/csv`"
 
-A request has an associated **no-cors media URL** ("N/A", "initial-request", or a URL). "N/A" unless explicitly stated otherwise.
+### Changes to requests and media elements
+
+A request has an associated **no-cors media URL** ("N/A", "initial-request", or a URL). It is "N/A" unless explicitly stated otherwise.
+
+We adjust the way media element fetching is done to more clearly separate between the initial and any subsequent range fetches:
+
+* For its initial range request a media element sets no-cors media URL to "initial-request" and it follows redirects. That yields (after any redirects) an initial response.
+* For its subsequent range requests the URL of the initial response is used as value of no-cors media URL (and URL) and it no longer follows redirects. Note: redirects here resulted in an error in Chrome until recently. We could somewhat easily allow same-origin redirects by adjusting the check performed against this URL, but it's not clear that's desirable.
+
+(These changes are not needed when CORS is used, but it might make sense to align these somewhat, to the extent they are not already.)
+
+### ORB's algorithm
 
 To determine whether to allow response _response_ to a request _request_, run these steps:
 
