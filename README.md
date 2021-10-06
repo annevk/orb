@@ -56,12 +56,12 @@ An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence i
 
 ### Changes to requests and media elements
 
-A request has an associated **no-cors media URL** ("N/A", "initial-request", or a URL). It is "N/A" unless explicitly stated otherwise.
+A request has an associated **no-cors media request state** ("N/A", "initial", or "subsequent"). It is "N/A" unless explicitly stated otherwise.
 
 We adjust the way media element fetching is done to more clearly separate between the initial and any subsequent range fetches:
 
-* For its initial range request a media element sets no-cors media URL to "initial-request" and it follows redirects. That yields (after any redirects) an initial response.
-* For its subsequent range requests the URL of the initial response is used as value of no-cors media URL (and URL) and it no longer follows redirects. Note: redirects here resulted in an error in Chrome until recently. We could somewhat easily allow same-origin redirects by adjusting the check performed against this URL, but it's not clear that's desirable.
+* For its initial range request a media element sets request's no-cors media request state to "initial" and it follows redirects. That yields (after any redirects) an initial response.
+* For its subsequent range requests the URL of the initial response is used as request's URL, it no longer follows redirects, and request's no-cors media request state is set to "subsequent". Note: redirects here resulted in an error in Chrome until recently. We could somewhat easily allow same-origin redirects by adjusting the check performed against request's no-cors media request state, but it's not clear that's desirable.
 
 (These changes are not needed when CORS is used, but it might make sense to align these somewhat, to the extent they are not already.)
 
@@ -76,14 +76,14 @@ To determine whether to allow response _response_ to a request _request_, run th
    1. If _mimeType_ is an opaque-blocklisted-never-sniffed MIME type, then return false.
    1. If _response_'s status is 206 and _mimeType_ is an opaque-blocklisted MIME type, then return false.
    1. If _nosniff_ is true and _mimeType_ is an opaque-blocklisted MIME type or its essence is "`text/plain`", then return false.
-1. If _request_'s no-cors media URL is a URL and it is equal to _request_'s current URL, then return true.
+1. If _request_'s no-cors media request state is "subsequent", then return true.
+1. If _response_'s status is 206 and [validate a partial response](https://wicg.github.io/background-fetch/#validate-a-partial-response) given 0 and _response_ returns invalid, then return false.
 1. Wait for 1024 bytes of _response_ or end-of-file, whichever comes first and let _bytes_ be those bytes.
 1. If the [audio or video type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#audio-or-video-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then:
-   1. If _requests_'s no-cors media URL is not "initial-request", then return false.
+   1. If _requests_'s no-cors media request state is not "initial", then return false.
    1. If _response_'s status is not 200 or 206, then return false.
-   1. If _response_'s status is 206 and [validate a partial response](https://wicg.github.io/background-fetch/#validate-a-partial-response) given 0 and _response_ returns invalid, then return false.
    1. Return true.
-1. If _requests_'s no-cors media URL is not "N/A", then return false.
+1. If _requests_'s no-cors media request state is not "N/A", then return false.
 1. If the [image type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#image-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then return true.
 1. If _nosniff_ is true, then return false.
 1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
@@ -96,7 +96,7 @@ Note: responses for which the above algorithm returns true and contain secrets a
 
 ## Implementation considerations
 
-Setting the no-cors media URL to a URL ideally happens in a process that is not easily compromised as otherwise it can be used to bypass ORB in such a compromised process.
+Setting request's no-cors media request state to "subsequent" ideally happens in a process that is not easily compromised, because such a spoofed value can be used to bypass ORB. In particular, "subsequent" is only to be allowed and used if a trustworthy process can verify that the media element (or its node document, or its node document's origin) has previously received a response with the same URL that has sniffed as audio or video.
 
 ## Findings
 
