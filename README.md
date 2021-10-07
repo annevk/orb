@@ -6,9 +6,11 @@ To block as many opaque responses as possible while remaining web compatible.
 
 ## High-level idea
 
-CSS, JavaScript, and media (audio, images, video) can be requested across origins without CORS. Except for CSS there is no MIME type enforcement. Ideally we still block as many responses as possible that are not one of these types to avoid leaking their contents through side channels.
+CSS, JavaScript, images, and media (audio and video) can be requested across origins without CORS. Except for CSS there is no MIME type enforcement. Ideally we still block as many responses as possible that are not one of these types to avoid leaking their contents through side channels.
 
 ## Processing model
+
+### New MIME type sets
 
 An **opaque-safelisted MIME type** is a [JavaScript MIME type](https://mimesniff.spec.whatwg.org/#javascript-mime-type) or a MIME type whose essence is "`text/css`" or "`image/svg+xml`".
 
@@ -56,11 +58,18 @@ An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence i
 * "`text/csv`"
 * "`text/vtt`"
 
-A user agent has an **opaque-safelisted requesters set**. (This should be scoped similar to other network caches.)
+### Changes to requests and media elements
 
-A request has an associated **opaque media identifier** (null or an opaque identifier). Null unless explicitly stated otherwise.
+A request has an associated **no-cors media request state** ("N/A", "initial", or "subsequent"). It is "N/A" unless explicitly stated otherwise.
 
-\[The idea here is that the opaque media identifier is owned by the media element (audio/video only; I'm assuming we won't do range requests for images without at least requiring MIME types at this point). As part of the element being GC'd, it would send a message to get all the relevant entries from the user agent's opaque-safelisted requesters set removed. There might be better strategies available here and it's not clear to me to what extent we need to specify this, but it's probably good to have a model that does not leak memory forever so the set needs to be keyed to something. The fetch group might also be reasonable.]
+We adjust the way media element fetching is done to more clearly separate between the initial and any subsequent range fetches:
+
+* For its initial range request a media element sets request's no-cors media request state to "initial" and it follows redirects. That yields (after any redirects) an initial response.
+* For its subsequent range requests the URL of the initial response is used as request's URL, it no longer follows redirects, and request's no-cors media request state is set to "subsequent". Note: redirects here resulted in an error in Chrome until recently. We could somewhat easily allow same-origin redirects by adjusting the check performed against request's no-cors media request state, but it's not clear that's desirable.
+
+(These changes are not needed when CORS is used, but it might make sense to align these somewhat, to the extent they are not already.)
+
+### ORB's algorithm
 
 To determine whether to allow response _response_ to a request _request_, run these steps:
 
@@ -69,14 +78,17 @@ To determine whether to allow response _response_ to a request _request_, run th
 1. If _mimeType_ is not failure, then:
    1. If _mimeType_ is an opaque-safelisted MIME type, then return true.
    1. If _mimeType_ is an opaque-blocklisted-never-sniffed MIME type, then return false.
-   1. If _response_'s status is `206` and _mimeType_ is an opaque-blocklisted MIME type, then return false. TODO: is this needed with the requesters set?
+   1. If _response_'s status is 206 and _mimeType_ is an opaque-blocklisted MIME type, then return false.
    1. If _nosniff_ is true and _mimeType_ is an opaque-blocklisted MIME type or its essence is "`text/plain`", then return false.
-1. If the user agent's opaque-safelisted requesters set contains (_request_'s opaque media identifier, _request_'s current URL), then return true.
+1. If _request_'s no-cors media request state is "subsequent", then return true.
+1. If _response_'s status is 206 and [validate a partial response](https://wicg.github.io/background-fetch/#validate-a-partial-response) given 0 and _response_ returns invalid, then return false.
 1. Wait for 1024 bytes of _response_ or end-of-file, whichever comes first and let _bytes_ be those bytes.
-1. If the [image type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#image-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then return true.
 1. If the [audio or video type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#audio-or-video-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then:
-   1. Append (_request_'s opaque media identifier, _request_'s current URL) to the user agent's opaque-safelisted requesters set.
+   1. If _requests_'s no-cors media request state is not "initial", then return false.
+   1. If _response_'s status is not 200 or 206, then return false.
    1. Return true.
+1. If _requests_'s no-cors media request state is not "N/A", then return false.
+1. If the [image type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#image-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then return true.
 1. If _nosniff_ is true, then return false.
 1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
 1. If _mimeType_ is failure, then return true.
@@ -87,10 +99,15 @@ To determine whether to allow response _response_ to a request _request_, run th
 
 Note: responses for which the above algorithm returns true and contain secrets are strongly encouraged to be protected using `Cross-Origin-Resource-Policy`.
 
+## Implementation considerations
+
+Setting request's no-cors media request state to "subsequent" ideally happens in a process that is not easily compromised, because such a spoofed value can be used to bypass ORB. In particular, "subsequent" is only to be allowed and used if a trustworthy process can verify that the media element (or its node document, or its node document's origin) has previously received a response with the same URL that has sniffed as audio or video.
+
 ## Findings
 
-* It's unfortunate `X-Content-Type-Options` mostly kicks in after media sniffing, but it was not web compatible for Firefox to enforce it for images back in the day.
+* It's unfortunate `X-Content-Type-Options` mostly kicks in after image/media sniffing, but it was not web compatible for Firefox to enforce it for images back in the day.
 * Due to the way [style sheet fetching works](https://github.com/whatwg/fetch/issues/964) we cannot protect responses without an extractable MIME type.
+* Media elements always make range requests.
 
 ## Acknowledgments
 
