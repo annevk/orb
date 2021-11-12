@@ -12,7 +12,9 @@ CSS, JavaScript, images, and media (audio and video) can be requested across ori
 
 ### New MIME type sets
 
-An **opaque-safelisted MIME type** is a [JavaScript MIME type](https://mimesniff.spec.whatwg.org/#javascript-mime-type) or a MIME type whose essence is "`text/css`" or "`image/svg+xml`".
+An **opaque-safelisted MIME type** is a [JavaScript MIME type](https://mimesniff.spec.whatwg.org/#javascript-mime-type)
+or a MIME type whose essence starts with "`audio/`", "`image/`", or "`video/`"
+or a MIME type whose essence is "`application/dash+xml`", "`application/ogg`", "`application/vnd.apple.mpegurl`", "`text/css`", or "`text/vtt`", .
 
 An **opaque-blocklisted MIME type** is an [HTML MIME type](https://mimesniff.spec.whatwg.org/#html-mime-type), [JSON MIME type](https://mimesniff.spec.whatwg.org/#json-mime-type), or [XML MIME type](https://mimesniff.spec.whatwg.org/#xml-mime-type).
 
@@ -92,7 +94,6 @@ To determine whether to allow response _response_ to a request _request_, run th
 1. If _nosniff_ is true, then return false.
 1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
 1. If _mimeType_ is failure, then return true.
-1. If _mimeType_'s essence starts with "`audio/`", "`image/`", or "`video/`", then return false.
 1. Wait for end-of-file of _response_'s body. Note: as discussed in [GitHub's annevk/orb #22](https://github.com/annevk/orb/issues/22) partially parsing JavaScript is unfortunately infeasible. This might end up leaking the size of responses that hit this step.
 1. If _response_'s body parses as JavaScript and does not parse as JSON, then return true.
 1. Return false.
