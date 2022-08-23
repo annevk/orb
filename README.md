@@ -1,5 +1,13 @@
 # Opaque Response Blocking (ORB, aka CORB++)
 
+## Status
+
+This repository is being upstreamed to the Fetch Standard through [PR #1442](https://github.com/whatwg/fetch/pull/1442). As indicated there you can [preview a version of the Fetch Standard with the new text integrated](https://whatpr.org/fetch/1442.html).
+
+The PR is primarily blocked on resolving the [mvp issues](https://github.com/annevk/orb/labels/mvp). Help appreciated!
+
+The PR is in a more advanced state than the text below and should be the starting point for implementers and reviewers.
+
 ## Objective
 
 To block as many opaque responses as possible while remaining web compatible.
